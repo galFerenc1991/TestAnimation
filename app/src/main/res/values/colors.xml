@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorWave">#4083ff</color>
+    <color name="backgroundColor">#042055</color>
+    <color name="wathetBackgroundColor">#0e1031</color>
+    <color name="white">#ffffff</color>
+    <color name="smallCircleColor">#1e3072</color>
+</resources>
