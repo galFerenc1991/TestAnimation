@@ -1,8 +1,5 @@
 package com.example.hm.myanimation;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,11 +10,17 @@ import android.graphics.Point;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
+
+import com.example.hm.myanimation.states.State;
+import com.example.hm.myanimation.states.three.StateReAnimate;
+import com.example.hm.myanimation.states.two.StateGoToStateThree;
+import com.example.hm.myanimation.states.two.StateTwo;
+import com.example.hm.myanimation.states.three.StateAnimateTwoCircles;
+import com.example.hm.myanimation.states.three.StateThree;
+import com.example.hm.myanimation.states.two.StateTwoReanimate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,46 +29,51 @@ import java.util.List;
  * Created by Ferenc on 2016.05.30..
  */
 public class CustomBackground extends View implements ValueAnimator.AnimatorUpdateListener{
-    private List<Animator> animatorsGroup = new ArrayList<>();
+    public WaveListener waveListener;
+    public List<Title> titles = new ArrayList<>();
+    public int touchedPlatform;
+    public State state;
+    public StateThree three;
+    public StateReAnimate stateReAnimate;
+    public StateAnimateTwoCircles stateAnimateTwoCircles;
+    public StateTwo two;
+    public StateTwoReanimate stateTwoReanimate;
+    public StateGoToStateThree stateGoToStateThree;
     private  boolean tapUpInCenterCircle;
     private Paint backGroundPaint;
     private Paint paintForWhiteLines;
     private Paint paintForSmallCircles;
     private static float origoX;
     private static float origoY;
-    private int angleForFirstCircle = 0;
-    private int angleForSecondCircle = 120;
-    private int angleForThirdCircle = 240;
+    public int angleForFirstCircle = 0;
+    public int angleForSecondCircle = 120;
+    public int angleForThirdCircle = 240;
     //////Test values/////
-    private int angleForFirstCircleTest;
-    private int angleForSecondCircleTest;
-    private int angleForThirdCircleTest;
+    public int angleForFirstCircleTest;
+    public int angleForSecondCircleTest;
+    public int angleForThirdCircleTest;
     /////////////////////
-    private int X1;
-    private int Y1;
-    private int X2;
-    private int Y2;
-    private int X3;
-    private int Y3;
-    private Point optimalPoint;
+    public int X1;
+    public int Y1;
+    public int X2;
+    public int Y2;
+    public int X3;
+    public int Y3;
+    public Point optimalPoint;
     private Point startPoint;
-    private Point endPoint;
-    private float radiusForSmallCircles;
-    private float radiusForSmallCircle_1;
-    private float radiusForSmallCircle_2;
-    private float radiusForSmallCircle_3;
+    public Point endPoint;
+    public Point startForStateGoToStateThree;
+    public Point endPointForStateGoToStateThree;
+    public float radiusForSmallCircles;
+    public float radiusForSmallCircle_1;
+    public float radiusForSmallCircle_2;
+    public float radiusForSmallCircle_3;
     private double radiusTouch;
     private double radiusTouch1;
     private double radiusTouch2;
     private double radiusTouch3;
-    private ValueAnimator animator;
-    private ValueAnimator animator1;
-    private ValueAnimator radiusAnimator;
-    private ValueAnimator pointAnimator;
-    private AnimatorSet set;
-    private AnimatorSet set1;
-    private GestureDetector mGestureDetector;
-    private int touchedCircle;
+    public GestureDetector mGestureDetector;
+    public int touchedCircle;
     private int[] colors = {Color.argb(0, 0, 0, 0)
             ,Color.argb(50, 38, 64, 125)
             ,Color.argb(255, 38, 64, 125)
@@ -83,13 +91,27 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
 
     public CustomBackground(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
         initPaint();
         initPoint();
         mGestureDetector = new GestureDetector(context, new GestureListener());
         mGestureDetector.setIsLongpressEnabled(false);
+        initStates();
+    }
+
+    public void initStates(){
+        three = new StateThree(this);
+        stateReAnimate = new StateReAnimate(this);
+        stateAnimateTwoCircles = new StateAnimateTwoCircles(this);
+        two = new StateTwo(this);
+        stateTwoReanimate = new StateTwoReanimate(this);
+        stateGoToStateThree = new StateGoToStateThree(this);
+        state = three;
     }
 
     public void initPoint(){
+        endPointForStateGoToStateThree = new Point();
+        startForStateGoToStateThree = new Point();
         optimalPoint = new Point();
         startPoint = new Point();
         endPoint = new Point();
@@ -205,7 +227,6 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
         drawSmallCircles1(canvas);
         drawSmallCircles2(canvas);
         drawSmallCircles3(canvas);
-
     }
 
     @Override
@@ -213,166 +234,116 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
         super.onSizeChanged(w, h, oldw, oldh);
 
         initRadiusForSmallCircle();
-        setAnimator();
+        state.doFocus();
     }
-
-    private ValueAnimator.AnimatorUpdateListener listener = new ValueAnimator.AnimatorUpdateListener() {
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-
-        }
-    };
 
     @Override
     public void onAnimationUpdate(ValueAnimator animation) {
-        Log.d("Update","Update");
-        if(animation == animator1){
-
-            if(touchedCircle == 1){
-                radiusForSmallCircle_1 = (float)radiusAnimator.getAnimatedValue();
-                angleForSecondCircle = angleForSecondCircleTest - (int)animator1.getAnimatedValue()/2;
-                angleForThirdCircle = angleForThirdCircleTest + (int) animator1.getAnimatedValue()/2;
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-            }
-            if(touchedCircle == 2){
-                radiusForSmallCircle_2 = (float)radiusAnimator.getAnimatedValue();
-                angleForFirstCircle = angleForFirstCircleTest + (int)animator1.getAnimatedValue()/2;
-                angleForThirdCircle = angleForThirdCircleTest - (int) animator1.getAnimatedValue()/2;
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-
-            }
-            if(touchedCircle == 3){
-                radiusForSmallCircle_3 = (float)radiusAnimator.getAnimatedValue();
-                angleForFirstCircle = angleForFirstCircleTest - (int)animator1.getAnimatedValue()/2;
-                angleForSecondCircle = angleForSecondCircleTest + (int) animator1.getAnimatedValue()/2;
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-            }
-
-        }if(animation == animator){
-
-            if(touchedCircle == 1){
-
-                angleForSecondCircle = ((int) animator.getAnimatedValue() + 90) % 360;
-                angleForThirdCircle = ((int) animator.getAnimatedValue() + 270) % 360;
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-            }
-            if(touchedCircle == 2){
-                angleForFirstCircle = (int) animator.getAnimatedValue()+30;
-                angleForThirdCircle = ((int) animator.getAnimatedValue() + 210) % 360;
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-
-            }
-            if(touchedCircle == 3){
-                angleForFirstCircle = (int) animator.getAnimatedValue() + 330;
-                angleForSecondCircle = ((int) animator.getAnimatedValue() + 150) % 360;
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-            }
-            if(touchedCircle == 0){
-                angleForFirstCircle = (int) animator.getAnimatedValue();
-                angleForSecondCircle = ((int) animator.getAnimatedValue() + 120) % 360;
-                angleForThirdCircle = ((int) animator.getAnimatedValue() + 240) % 360;
-                angleForFirstCircleTest = angleForFirstCircle;
-                angleForSecondCircleTest = angleForSecondCircle;
-                angleForThirdCircleTest = angleForThirdCircle;
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-            }
-        }if(animation == pointAnimator){
-            if(touchedCircle == 1){
-
-                initCoordinatesForSmallCircles(findAngelForSmallCircle(optimalPoint), angleForSecondCircle, angleForThirdCircle);
-            }
-            if(touchedCircle == 2){
-
-                initCoordinatesForSmallCircles(angleForFirstCircle, findAngelForSmallCircle(optimalPoint), angleForThirdCircle);
-            }
-            if(touchedCircle == 3){
-
-                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, findAngelForSmallCircle(optimalPoint));
-            }
-        }
-
+//        if(animation == animator1){
+//
+//            if(touchedCircle == 1){
+//                radiusForSmallCircle_1 = (float)radiusAnimator.getAnimatedValue();
+//                angleForSecondCircle = angleForSecondCircleTest - (int)animator1.getAnimatedValue()/2;
+//                angleForThirdCircle = angleForThirdCircleTest + (int) animator1.getAnimatedValue()/2;
+//                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
+//            }
+//            if(touchedCircle == 2){
+//                radiusForSmallCircle_2 = (float)radiusAnimator.getAnimatedValue();
+//                angleForFirstCircle = angleForFirstCircleTest + (int)animator1.getAnimatedValue()/2;
+//                angleForThirdCircle = angleForThirdCircleTest - (int) animator1.getAnimatedValue()/2;
+//                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
+//
+//            }
+//            if(touchedCircle == 3){
+//                radiusForSmallCircle_3 = (float)radiusAnimator.getAnimatedValue();
+//                angleForFirstCircle = angleForFirstCircleTest - (int)animator1.getAnimatedValue()/2;
+//                angleForSecondCircle = angleForSecondCircleTest + (int) animator1.getAnimatedValue()/2;
+//                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
+//            }
+//        }
         invalidate();
     }
 
-    public void setAnimators(){
-
-        setAnimatorForTwoCirclePositive();
-        setAnimator();
-
-        set = new AnimatorSet();
-        set.playTogether(animatorsGroup);
-        set.play(animatorsGroup.get(animatorsGroup.size()-1)).before(animator);
-        set.start();
+    public void setState(State _state){
+        state = _state;
     }
 
-    public void setAnimators2(){
-
-        setAnimatorForPoint();
-        setAnimator();
-
-        set1 = new AnimatorSet();
-        set1.play(pointAnimator).before(animator);
-        set1.start();
-    }
-
-    public void setAnimator() {
-        animator = ValueAnimator.ofInt( angleForFirstCircleTest, angleForFirstCircleTest + 360 );
-        animator.setDuration(10000);
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(this);
-        animator.start();
-    }
-
-    public void setAnimatorForTwoCirclePositive(){
-
-        radiusAnimator = ValueAnimator.ofFloat(radiusForSmallCircles,0);
-        radiusAnimator.setDuration(500);
-        radiusAnimator.setInterpolator(new LinearInterpolator());
-        radiusAnimator.addUpdateListener(this);
-        animatorsGroup.add(radiusAnimator);
-
-        animator1 = ValueAnimator.ofInt(0,60);
-        animator1.setDuration(500);
-        animator1.setInterpolator(new LinearInterpolator());
-        animator1.addUpdateListener(this);
-        animatorsGroup.add(animator1);
-    }
-
-    public void setAnimatorForPoint(){
-        pointAnimator = ObjectAnimator.ofObject(this, "optimalPoint", new MyTypeEvaluator(), setStartPoint(), endPoint);
-        pointAnimator.setDuration(500);
-        pointAnimator.setInterpolator(new LinearInterpolator());
-        pointAnimator.addUpdateListener(this);
-        //pointAnimator.start();
-    }
-    public void setOptimalPoint(Point point) {
-        this.optimalPoint = point;
+    public void initCenterReAnimatedSmallCircles(MotionEvent _e){
+        if(radiusForSmallCircle_1 == 10){
+            X1 = (int)_e.getX();
+            Y1 = (int)_e.getY();
+            startForStateGoToStateThree.set(X1,Y1);
+        }
+        if(radiusForSmallCircle_2 == 10){
+            X2 = (int)_e.getX();
+            Y2 = (int)_e.getY();
+            startForStateGoToStateThree.set(X2,Y2);
+        }
+        if(radiusForSmallCircle_3 == 10){
+            X3 = (int)_e.getX();
+            Y3 = (int)_e.getY();
+            startForStateGoToStateThree.set(X3,Y3);
+        }
+        invalidate();
     }
 
     public Point setStartPoint(){
-        if(touchedCircle ==1){
+        if(touchedCircle == 1){
             startPoint.set(X1,Y1);
         }
-        if(touchedCircle ==2){
+        if(touchedCircle == 2){
             startPoint.set(X2,Y2);
         }
-        if(touchedCircle ==3){
+        if(touchedCircle == 3){
             startPoint.set(X3,Y3);
         }
         return startPoint;
     }
 
+    public void setEndPointForStateGoToStateThree(){
+        if(titles.get(0).getTouchedCircle() == 1){
+            endPointForStateGoToStateThree.set(findOrigoXForSmallCircle(angleForFirstCircle),findOrigoYForSmallCircle(angleForFirstCircle));
+        }
+        if(titles.get(0).getTouchedCircle() ==  2){
+            endPointForStateGoToStateThree.set(findOrigoXForSmallCircle(angleForSecondCircle),findOrigoYForSmallCircle(angleForSecondCircle));
+        }
+        if(titles.get(0).getTouchedCircle() ==  3){
+            endPointForStateGoToStateThree.set(findOrigoXForSmallCircle(angleForThirdCircle),findOrigoYForSmallCircle(angleForThirdCircle));
+        }
+
+    }
     public void setEndPoint(){
-        if(touchedCircle ==1){
+        if(touchedCircle == 1){
             endPoint.set(findOrigoXForSmallCircle(angleForFirstCircle),findOrigoYForSmallCircle(angleForFirstCircle));
         }
-        if(touchedCircle ==2){
+        if(touchedCircle == 2){
             endPoint.set(findOrigoXForSmallCircle(angleForSecondCircle),findOrigoYForSmallCircle(angleForSecondCircle));
         }
-        if(touchedCircle ==3){
+        if(touchedCircle == 3){
             endPoint.set(findOrigoXForSmallCircle(angleForThirdCircle),findOrigoYForSmallCircle(angleForThirdCircle));
         }
+    }
+
+    public void initTouchedPlatform(MotionEvent _event){
+        //float X = _event.getX();
+        float Y = _event.getY();
+        float bottomCenterCircle = getHeight()/2f + getWidth()/4f;
+        float sectorHeight = getWidth()/2f/3f;
+        if(bottomCenterCircle > Y && Y > bottomCenterCircle - sectorHeight ){
+            touchedPlatform = 1;
+        }
+        if(bottomCenterCircle - sectorHeight > Y && Y > bottomCenterCircle - sectorHeight * 2){
+            touchedPlatform = 2;
+        }
+        if(bottomCenterCircle - sectorHeight * 2 > Y && Y > bottomCenterCircle - sectorHeight * 3){
+            touchedPlatform = 3;
+        }
+    }
+
+    public void addNewPlatform(int _touchedCircle){
+        Title title = new Title();
+        title.setPlatform(_touchedCircle);
+        titles.add(title);
     }
 
     public int findAngelForSmallCircle(Point _optimalPoint){
@@ -400,21 +371,6 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
             Y = (int) (Math.sin(Math.toRadians((double) _angel))*getWidth()*3/8f + getHeight()/2);
             return Y;
         }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if(initTapTheCircle()){
-                if(tapUpInCenterCircle(event)){
-                    setAnimators();
-                }else{
-                    setAnimators2();
-                }
-            }
-        }
-        return true;
     }
 
     public void initRadiusTouchForSmallCircle(MotionEvent _event){
@@ -467,51 +423,67 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
         return tapUpInCenterCircle;
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (state.animationIsRunning()){
+            return false;
+        }else{
+            mGestureDetector.onTouchEvent(event);
+            state.setEvent(event);
+        }
+        return true;
+    }
+
     /**--------GestureListener--------------------------------------------------------------------------------------------------------------------- */
 
     public class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.d("scroll","scroll");
+            if (state.animationIsRunning()){
+                return false;
+            } else {
+                if(touchedCircle == 1){
+                    X1 = X1 - (int)distanceX;
+                    Y1 = Y1 - (int)distanceY;
+                    invalidate();
+                }
+                if(touchedCircle == 2){
+                    X2 = X2 - (int)distanceX;
+                    Y2 = Y2 - (int)distanceY;
+                    invalidate();
+                }
+                if(touchedCircle == 3){
+                    X3 = X3 - (int)distanceX;
+                    Y3 = Y3 - (int)distanceY;
+                    invalidate();
+                }
+            }
 
-            if(touchedCircle == 1){
-                animator.cancel();
-                X1 = X1 - (int)distanceX;
-                Y1 = Y1 - (int)distanceY;
-                invalidate();
-            }
-            if(touchedCircle == 2){
-                animator.cancel();
-                X2 = X2 - (int)distanceX;
-                Y2 = Y2 - (int)distanceY;
-                invalidate();
-            }
-            if(touchedCircle == 3){
-                animator.cancel();
-                X3 = X3 - (int)distanceX;
-                Y3 = Y3 - (int)distanceY;
-                invalidate();
-            }
            return true;
         }
 
-        @Override
-        public void onLongPress(MotionEvent e) {
-            super.onLongPress(e);
-        }
+//        @Override
+//        public void onLongPress(MotionEvent e) {
+//            super.onLongPress(e);
+//        }
 
         @Override
         public boolean onDown(MotionEvent e) {
-            initRadiusTouchForSmallCircle(e);
-            touchedCircle = findTouchedCircle(radiusTouch1, radiusTouch2, radiusTouch3);
-            if(initTapTheCircle()){
-                animator.removeAllUpdateListeners();
-                animator.cancel();
-                setEndPoint();
+            if (state.animationIsRunning()){
+                return false;
+            } else {
+                initRadiusTouchForSmallCircle(e);
+                touchedCircle = findTouchedCircle(radiusTouch1, radiusTouch2, radiusTouch3);
+                if(initTapTheCircle() || tapUpInCenterCircle(e)){
+                    state.stopAnimation();
+                    setEndPoint();
+                }
             }
             return false;
         }
+    }
 
-
+    public void setListener(WaveListener _waveListener){
+        waveListener = _waveListener;
     }
 }

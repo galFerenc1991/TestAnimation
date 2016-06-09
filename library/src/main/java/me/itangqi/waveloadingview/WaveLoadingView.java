@@ -45,7 +45,7 @@ public class WaveLoadingView extends View {
     private static final float DEFAULT_WATER_LEVEL_RATIO = 0.5f;
     private static final float DEFAULT_WAVE_LENGTH_RATIO = 1.0f;
     private static final float DEFAULT_WAVE_SHIFT_RATIO = 0.0f;
-    private static final int DEFAULT_WAVE_PROGRESS_VALUE = 50;
+    private static final int DEFAULT_WAVE_PROGRESS_VALUE = 0;
     private static final int DEFAULT_WAVE_COLOR = Color.parseColor("#212121");
     private static final int DEFAULT_TITLE_COLOR = Color.parseColor("#212121");
     private static final float DEFAULT_BORDER_WIDTH = 0;
@@ -55,9 +55,9 @@ public class WaveLoadingView extends View {
     private static final int DEFAULT_RECTANGLE_WIDTH = 700;
     private static final int DEFAULT_RECTANGLE_HEIGHT = 350;
     private static final int DEFAULT_ROUND_RECTANGLE_X_AND_Y = 0;
-    private static final float DEFAULT_TITLE_TOP_SIZE = 18.0f;
-    private static final float DEFAULT_TITLE_CENTER_SIZE = 18.0f;
-    private static final float DEFAULT_TITLE_BOTTOM_SIZE = 18.0f;
+    private static final float DEFAULT_TITLE_TOP_SIZE = 24.0f;
+    private static final float DEFAULT_TITLE_CENTER_SIZE = 24.0f;
+    private static final float DEFAULT_TITLE_BOTTOM_SIZE = 24.0f;
 
     public enum ShapeType {
         TRIANGLE,
@@ -213,6 +213,12 @@ public class WaveLoadingView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
+
+        float Y =  getHeight() / 2 - ((mCenterTitlePaint.descent() + mCenterTitlePaint.ascent()) / 2);
+
+
+
+        Log.d("limit","" + mProgressValue );
         mCanvasSize = canvas.getWidth();
         if (canvas.getHeight() < mCanvasSize) {
             mCanvasSize = canvas.getHeight();
@@ -271,21 +277,30 @@ public class WaveLoadingView extends View {
             // I know, the code written here is very shit.
             if (!TextUtils.isEmpty(mTopTitle)) {
                 float top = mTopTitlePaint.measureText(mTopTitle);
+
+                float topY = (Y - getWidth()/8f);
+
                 canvas.drawText(mTopTitle, (getWidth() - top) / 2,
-                        getHeight() * 2 / 10.0f, mTopTitlePaint);
+                        topY, mTopTitlePaint);
             }
 
             if (!TextUtils.isEmpty(mCenterTitle)) {
                 float middle = mCenterTitlePaint.measureText(mCenterTitle);
+
+                float centerY = Y;
+
                 // Draw the text centered.
                 canvas.drawText(mCenterTitle, (getWidth() - middle) / 2,
-                        getHeight() / 2 - ((mCenterTitlePaint.descent() + mCenterTitlePaint.ascent()) / 2), mCenterTitlePaint);
+                       centerY, mCenterTitlePaint);
             }
 
             if (!TextUtils.isEmpty(mBottomTitle)) {
                 float bottom = mBottomTitlePaint.measureText(mBottomTitle);
+
+                float bottomY = (Y + getWidth()/8f);
+
                 canvas.drawText(mBottomTitle, (getWidth() - bottom) / 2,
-                        getHeight() * 8 / 10.0f - ((mBottomTitlePaint.descent() + mBottomTitlePaint.ascent()) / 2), mBottomTitlePaint);
+                        bottomY, mBottomTitlePaint);
             }
         } else {
             mWavePaint.setShader(null);
@@ -465,7 +480,7 @@ public class WaveLoadingView extends View {
     public void setProgressValue(int progress) {
         mProgressValue = progress;
         ObjectAnimator waterLevelAnim = ObjectAnimator.ofFloat(this, "waterLevelRatio", mWaterLevelRatio, ((float) mProgressValue / 100));
-        waterLevelAnim.setDuration(1000);
+        waterLevelAnim.setDuration(500);
         waterLevelAnim.setInterpolator(new DecelerateInterpolator());
         AnimatorSet animatorSetProgress = new AnimatorSet();
         animatorSetProgress.play(waterLevelAnim);
