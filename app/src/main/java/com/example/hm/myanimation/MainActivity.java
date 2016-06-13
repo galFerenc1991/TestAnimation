@@ -27,31 +27,29 @@ public class MainActivity extends AppCompatActivity implements WaveListener {
     @Override
     public void setWaveProgress() {
         int numPlatforms = mCustom.titles.size();
-        if (numPlatforms == 1){
-            mWaveLoadingView.setProgressValue(42);
-            mTextView.setVisibility(View.INVISIBLE);
-            mWaveLoadingView.setBottomTitle(mCustom.titles.get(0).getPlatform());
-            mWaveLoadingView.setTopTitle("");
-            mWaveLoadingView.setCenterTitle("");
-        }
-        if(numPlatforms == 2){
-            mWaveLoadingView.setProgressValue(58);
-            mWaveLoadingView.setBottomTitle(mCustom.titles.get(0).getPlatform());
-            mWaveLoadingView.setCenterTitle(mCustom.titles.get(1).getPlatform());
-            mWaveLoadingView.setTopTitle("");
-        }
-        if(numPlatforms == 3){
-            mWaveLoadingView.setProgressValue(100);
-            mWaveLoadingView.setBottomTitle(mCustom.titles.get(0).getPlatform());
-            mWaveLoadingView.setCenterTitle(mCustom.titles.get(1).getPlatform());
-            mWaveLoadingView.setTopTitle(mCustom.titles.get(2).getPlatform());
-        }
         if(numPlatforms == 0){
             mWaveLoadingView.setProgressValue(0);
             mTextView.setVisibility(View.VISIBLE);
             mWaveLoadingView.setBottomTitle("");
             mWaveLoadingView.setTopTitle("");
             mWaveLoadingView.setCenterTitle("");
+        } else if (numPlatforms == 1){
+            mWaveLoadingView.setProgressValue(42);
+            mTextView.setVisibility(View.INVISIBLE);
+            mWaveLoadingView.setBottomTitle(mCustom.titles.get(0).getPlatform());
+            mWaveLoadingView.setTopTitle("");
+            mWaveLoadingView.setCenterTitle("");
+        } else if(numPlatforms == 2){
+            mWaveLoadingView.setProgressValue(58);
+            mWaveLoadingView.setBottomTitle(mCustom.titles.get(0).getPlatform());
+            mWaveLoadingView.setCenterTitle(mCustom.titles.get(1).getPlatform());
+            mWaveLoadingView.setTopTitle("");
+        } else if(numPlatforms == 3){
+            mWaveLoadingView.setProgressValue(100);
+            mWaveLoadingView.setBottomTitle(mCustom.titles.get(0).getPlatform());
+            mWaveLoadingView.setCenterTitle(mCustom.titles.get(1).getPlatform());
+            mWaveLoadingView.setTopTitle(mCustom.titles.get(2).getPlatform());
         }
+
     }
 }

@@ -1,9 +1,8 @@
-package com.example.hm.myanimation.states.three;
+package com.example.hm.myanimation.states.one;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.animation.LinearInterpolator;
 
@@ -14,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Ferenc on 2016.06.07..
+ * Created by Ferenc on 2016.06.10..
  */
-public class StateThree implements State {
+public class StateOne implements State {
     private CustomBackground customBackground;
     private List<Animator> animatorsGroup = new ArrayList<>();
     AnimatorSet set;
@@ -25,7 +24,7 @@ public class StateThree implements State {
     private ValueAnimator animator3;
 
 
-    public StateThree(CustomBackground _customBackground){
+    public StateOne(CustomBackground _customBackground){
         customBackground = _customBackground;
     }
 
@@ -41,17 +40,27 @@ public class StateThree implements State {
 
     @Override
     public void setEvent(MotionEvent event) {
+        customBackground.initCenterReAnimatedSmallCircles(event);
+
         if (event.getAction() == MotionEvent.ACTION_UP){
 
             if(customBackground.initTapTheCircle()){
                 if(customBackground.tapUpInCenterCircle(event)){
-                    customBackground.setState(customBackground.stateAnimateTwoCircles);
-                    customBackground.stateAnimateTwoCircles.doFocus();
+                    customBackground.setState(customBackground.stateGoToStateZero);
+                    customBackground.stateGoToStateZero.doFocus();
 
                 } else{
-                    customBackground.setState(customBackground.stateReAnimate);
-                    customBackground.stateReAnimate.doFocus();
+                    customBackground.setState(customBackground.stateOneReAnimate);
+                    customBackground.stateOneReAnimate.doFocus();
                 }
+            }
+            if(customBackground.tapUpInCenterCircle(event) && customBackground.touchedCircle == 0){
+//                customBackground.initTouchedPlatform(event);
+//                if(customBackground.touchedPlatform == 1){
+//                    Log.d("platform", "" + customBackground.touchedPlatform);
+                customBackground.setState(customBackground.stateGoToStateTwo);
+                customBackground.stateGoToStateTwo.doFocus();
+                //}
             }
         }
     }
@@ -59,7 +68,7 @@ public class StateThree implements State {
     public void setAnimatorsGroup(){
         set = new AnimatorSet();
         set.playTogether(animatorsGroup);
-        set.play(animatorsGroup.get(animatorsGroup.size()-1));
+       // set.play(animatorsGroup.get(animatorsGroup.size()-1));
         set.start();
     }
 
@@ -94,11 +103,13 @@ public class StateThree implements State {
         customBackground.angleForThirdCircle = (int) animator3.getAnimatedValue() % 360;
 
         initCoordinatesForSmallCircles(customBackground.angleForFirstCircle,
-                                        customBackground.angleForSecondCircle,
-                                         customBackground.angleForThirdCircle);
+                customBackground.angleForSecondCircle,
+                customBackground.angleForThirdCircle);
 
+        customBackground.setEndPointForStateGoToStateTwo();
         customBackground.invalidate();
     }
+
     @Override
     public void initCoordinatesForSmallCircles(int _angleForFirstCircle, int _angleForSecondCircle, int _angleForThirdCircle) {
         customBackground.X1 = customBackground.findOrigoXForSmallCircle(_angleForFirstCircle);
@@ -118,3 +129,4 @@ public class StateThree implements State {
         return false;
     }
 }
+

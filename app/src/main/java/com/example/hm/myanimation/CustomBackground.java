@@ -1,36 +1,45 @@
 package com.example.hm.myanimation;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Picture;
 import android.graphics.Point;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.hm.myanimation.states.State;
+import com.example.hm.myanimation.states.one.StateGoToStateTwo;
+import com.example.hm.myanimation.states.one.StateGoToStateZero;
+import com.example.hm.myanimation.states.one.StateOne;
+import com.example.hm.myanimation.states.one.StateOneReanimate;
 import com.example.hm.myanimation.states.three.StateReAnimate;
+import com.example.hm.myanimation.states.two.StateGoToStateOne;
 import com.example.hm.myanimation.states.two.StateGoToStateThree;
 import com.example.hm.myanimation.states.two.StateTwo;
 import com.example.hm.myanimation.states.three.StateAnimateTwoCircles;
 import com.example.hm.myanimation.states.three.StateThree;
 import com.example.hm.myanimation.states.two.StateTwoReanimate;
+import com.example.hm.myanimation.states.zero.StateComeBackToStateOne;
+import com.example.hm.myanimation.states.zero.StateZero;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Ferenc on 2016.05.30..
  */
-public class CustomBackground extends View implements ValueAnimator.AnimatorUpdateListener{
+public class CustomBackground extends View{
     public WaveListener waveListener;
-    public List<Title> titles = new ArrayList<>();
+    public ArrayList<Title> titles = new ArrayList<>();
     public int touchedPlatform;
     public State state;
     public StateThree three;
@@ -39,6 +48,13 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
     public StateTwo two;
     public StateTwoReanimate stateTwoReanimate;
     public StateGoToStateThree stateGoToStateThree;
+    public StateGoToStateOne stateGoToStateOne;
+    public StateOne one;
+    public StateGoToStateTwo stateGoToStateTwo;
+    public StateOneReanimate stateOneReAnimate;
+    public StateGoToStateZero stateGoToStateZero;
+    public StateZero zero;
+    public StateComeBackToStateOne stateComeBackToStateOne;
     private  boolean tapUpInCenterCircle;
     private Paint backGroundPaint;
     private Paint paintForWhiteLines;
@@ -48,10 +64,6 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
     public int angleForFirstCircle = 0;
     public int angleForSecondCircle = 120;
     public int angleForThirdCircle = 240;
-    //////Test values/////
-    public int angleForFirstCircleTest;
-    public int angleForSecondCircleTest;
-    public int angleForThirdCircleTest;
     /////////////////////
     public int X1;
     public int Y1;
@@ -62,8 +74,10 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
     public Point optimalPoint;
     private Point startPoint;
     public Point endPoint;
-    public Point startForStateGoToStateThree;
+    public Point startForStateGoToBottomState;
     public Point endPointForStateGoToStateThree;
+    public Point endPointForStateGoToStateTwo;
+    public Point endPointForStateGoToStateOne;
     public float radiusForSmallCircles;
     public float radiusForSmallCircle_1;
     public float radiusForSmallCircle_2;
@@ -100,27 +114,36 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
     }
 
     public void initStates(){
-        three = new StateThree(this);
-        stateReAnimate = new StateReAnimate(this);
-        stateAnimateTwoCircles = new StateAnimateTwoCircles(this);
-        two = new StateTwo(this);
-        stateTwoReanimate = new StateTwoReanimate(this);
-        stateGoToStateThree = new StateGoToStateThree(this);
+        three =                   new StateThree(this);
+        stateReAnimate =          new StateReAnimate(this);
+        stateAnimateTwoCircles =  new StateAnimateTwoCircles(this);
+        two =                     new StateTwo(this);
+        stateTwoReanimate =       new StateTwoReanimate(this);
+        stateGoToStateThree =     new StateGoToStateThree(this);
+        stateGoToStateOne =       new StateGoToStateOne(this);
+        one =                     new StateOne(this);
+        stateGoToStateTwo =       new StateGoToStateTwo(this);
+        stateOneReAnimate =       new StateOneReanimate(this);
+        stateGoToStateZero =      new StateGoToStateZero(this);
+        zero =                    new StateZero(this);
+        stateComeBackToStateOne = new StateComeBackToStateOne(this);
         state = three;
     }
 
     public void initPoint(){
-        endPointForStateGoToStateThree = new Point();
-        startForStateGoToStateThree = new Point();
-        optimalPoint = new Point();
-        startPoint = new Point();
-        endPoint = new Point();
+        endPointForStateGoToStateOne =    new Point();
+        endPointForStateGoToStateTwo =    new Point();
+        endPointForStateGoToStateThree =  new Point();
+        startForStateGoToBottomState =    new Point();
+        optimalPoint =                    new Point();
+        startPoint =                      new Point();
+        endPoint =                        new Point();
     }
 
     public void initPaint(){
 
-        paintForWhiteLines = new Paint();
-        DashPathEffect dashPath = new DashPathEffect(new float[] {5,5}, 1);
+        paintForWhiteLines =       new Paint();
+        DashPathEffect dashPath =  new DashPathEffect(new float[] {5,5}, 1);
         paintForWhiteLines.setPathEffect(dashPath);
         paintForWhiteLines.setStyle(Paint.Style.STROKE);
         paintForWhiteLines.setColor(Color.WHITE);
@@ -147,7 +170,7 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
     }
 
     public void initRadiusForSmallCircle(){
-        radiusForSmallCircles = getWidth()/8f * 0.9f;
+        radiusForSmallCircles =   getWidth()/8f * 0.9f;
         radiusForSmallCircle_1 =  getWidth()/8f * 0.9f;
         radiusForSmallCircle_2 =  getWidth()/8f * 0.9f;
         radiusForSmallCircle_3 =  getWidth()/8f * 0.9f;
@@ -163,49 +186,9 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
         _canvas.drawCircle(origoX,origoY,getWidth()*6/8f, paintForWhiteLines);
     }
 
-    public void initCoordinatesForSmallCircles(int _angleForFirstCircle,
-                                               int _angleForSecondCircle,
-                                               int _angleForThirdCircle){
-
-            if(touchedCircle == 1){
-                X2 = findOrigoXForSmallCircle(_angleForSecondCircle);
-                Y2 = findOrigoYForSmallCircle(_angleForSecondCircle);
-
-                ///// X and Y for third small circle
-                X3 = findOrigoXForSmallCircle(_angleForThirdCircle);
-                Y3 = findOrigoYForSmallCircle(_angleForThirdCircle);
-            }
-            if(touchedCircle == 2){
-                X1 = findOrigoXForSmallCircle(_angleForFirstCircle);
-                Y1 = findOrigoYForSmallCircle(_angleForFirstCircle);
-
-                X3 = findOrigoXForSmallCircle(_angleForThirdCircle);
-                Y3 = findOrigoYForSmallCircle(_angleForThirdCircle);
-            }
-            if(touchedCircle ==3){
-                X1 = findOrigoXForSmallCircle(_angleForFirstCircle);
-                Y1 = findOrigoYForSmallCircle(_angleForFirstCircle);
-
-                ///// X and Y for second small circle
-                X2 = findOrigoXForSmallCircle(_angleForSecondCircle);
-                Y2 = findOrigoYForSmallCircle(_angleForSecondCircle);
-            }
-            if(touchedCircle == 0 || tapUpInCenterCircle == false){
-                ///// X and Y for first small circle
-                X1 = findOrigoXForSmallCircle(_angleForFirstCircle);
-                Y1 = findOrigoYForSmallCircle(_angleForFirstCircle);
-
-                ///// X and Y for second small circle
-                X2 = findOrigoXForSmallCircle(_angleForSecondCircle);
-                Y2 = findOrigoYForSmallCircle(_angleForSecondCircle);
-
-                ///// X and Y for third small circle
-                X3 = findOrigoXForSmallCircle(_angleForThirdCircle);
-                Y3 = findOrigoYForSmallCircle(_angleForThirdCircle);
-            }
-    }
-
     public void drawSmallCircles1(Canvas _canvas){
+        Log.d("optimal Point", "" + X1);
+
         _canvas.drawCircle(X1,Y1, radiusForSmallCircle_1, paintForSmallCircles);
     }
 
@@ -219,6 +202,7 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
 
     @Override
     protected void onDraw(Canvas canvas) {
+
         initOrigoCenterCircle();
         initPaintForBackground();
         initPaintForSmallCircles();
@@ -227,6 +211,7 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
         drawSmallCircles1(canvas);
         drawSmallCircles2(canvas);
         drawSmallCircles3(canvas);
+
     }
 
     @Override
@@ -237,53 +222,17 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
         state.doFocus();
     }
 
-    @Override
-    public void onAnimationUpdate(ValueAnimator animation) {
-//        if(animation == animator1){
-//
-//            if(touchedCircle == 1){
-//                radiusForSmallCircle_1 = (float)radiusAnimator.getAnimatedValue();
-//                angleForSecondCircle = angleForSecondCircleTest - (int)animator1.getAnimatedValue()/2;
-//                angleForThirdCircle = angleForThirdCircleTest + (int) animator1.getAnimatedValue()/2;
-//                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-//            }
-//            if(touchedCircle == 2){
-//                radiusForSmallCircle_2 = (float)radiusAnimator.getAnimatedValue();
-//                angleForFirstCircle = angleForFirstCircleTest + (int)animator1.getAnimatedValue()/2;
-//                angleForThirdCircle = angleForThirdCircleTest - (int) animator1.getAnimatedValue()/2;
-//                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-//
-//            }
-//            if(touchedCircle == 3){
-//                radiusForSmallCircle_3 = (float)radiusAnimator.getAnimatedValue();
-//                angleForFirstCircle = angleForFirstCircleTest - (int)animator1.getAnimatedValue()/2;
-//                angleForSecondCircle = angleForSecondCircleTest + (int) animator1.getAnimatedValue()/2;
-//                initCoordinatesForSmallCircles(angleForFirstCircle, angleForSecondCircle, angleForThirdCircle);
-//            }
-//        }
-        invalidate();
-    }
 
     public void setState(State _state){
         state = _state;
     }
 
     public void initCenterReAnimatedSmallCircles(MotionEvent _e){
-        if(radiusForSmallCircle_1 == 10){
-            X1 = (int)_e.getX();
-            Y1 = (int)_e.getY();
-            startForStateGoToStateThree.set(X1,Y1);
-        }
-        if(radiusForSmallCircle_2 == 10){
-            X2 = (int)_e.getX();
-            Y2 = (int)_e.getY();
-            startForStateGoToStateThree.set(X2,Y2);
-        }
-        if(radiusForSmallCircle_3 == 10){
-            X3 = (int)_e.getX();
-            Y3 = (int)_e.getY();
-            startForStateGoToStateThree.set(X3,Y3);
-        }
+
+        int x = (int)_e.getX();
+        int y = (int)_e.getY();
+        startForStateGoToBottomState.set(x,y);
+
         invalidate();
     }
 
@@ -301,6 +250,8 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
     }
 
     public void setEndPointForStateGoToStateThree(){
+        if (titles.isEmpty())
+            return;
         if(titles.get(0).getTouchedCircle() == 1){
             endPointForStateGoToStateThree.set(findOrigoXForSmallCircle(angleForFirstCircle),findOrigoYForSmallCircle(angleForFirstCircle));
         }
@@ -312,6 +263,37 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
         }
 
     }
+
+    public void setEndPointForStateGoToStateTwo(){
+        if (titles.isEmpty())
+            return;
+        if(titles.get(1).getTouchedCircle() == 1){
+            endPointForStateGoToStateTwo.set(findOrigoXForSmallCircle(angleForFirstCircle),findOrigoYForSmallCircle(angleForFirstCircle));
+        }
+        if(titles.get(1).getTouchedCircle() ==  2){
+            endPointForStateGoToStateTwo.set(findOrigoXForSmallCircle(angleForSecondCircle),findOrigoYForSmallCircle(angleForSecondCircle));
+        }
+        if(titles.get(1).getTouchedCircle() ==  3){
+            endPointForStateGoToStateTwo.set(findOrigoXForSmallCircle(angleForThirdCircle),findOrigoYForSmallCircle(angleForThirdCircle));
+        }
+
+    }
+
+    public void setEndPointForStateGoToStateOne(){
+        if (titles.isEmpty())
+            return;
+        if(titles.get(2).getTouchedCircle() == 1){
+            endPointForStateGoToStateOne.set(findOrigoXForSmallCircle(angleForFirstCircle),findOrigoYForSmallCircle(angleForFirstCircle));
+        }
+        if(titles.get(2).getTouchedCircle() ==  2){
+            endPointForStateGoToStateOne.set(findOrigoXForSmallCircle(angleForSecondCircle),findOrigoYForSmallCircle(angleForSecondCircle));
+        }
+        if(titles.get(2).getTouchedCircle() ==  3){
+            endPointForStateGoToStateOne.set(findOrigoXForSmallCircle(angleForThirdCircle),findOrigoYForSmallCircle(angleForThirdCircle));
+        }
+
+    }
+
     public void setEndPoint(){
         if(touchedCircle == 1){
             endPoint.set(findOrigoXForSmallCircle(angleForFirstCircle),findOrigoYForSmallCircle(angleForFirstCircle));
@@ -425,6 +407,7 @@ public class CustomBackground extends View implements ValueAnimator.AnimatorUpda
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.d("initTap", "" + initTapTheCircle());
         if (state.animationIsRunning()){
             return false;
         }else{

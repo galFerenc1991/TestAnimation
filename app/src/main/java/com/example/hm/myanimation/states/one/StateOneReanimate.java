@@ -1,4 +1,4 @@
-package com.example.hm.myanimation.states.three;
+package com.example.hm.myanimation.states.one;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -14,15 +14,15 @@ import com.example.hm.myanimation.MyTypeEvaluator;
 import com.example.hm.myanimation.states.State;
 
 /**
- * Created by Ferenc on 2016.06.07..
+ * Created by Ferenc on 2016.06.11..
  */
-public class StateReAnimate implements State, ValueAnimator.AnimatorUpdateListener {
+public class StateOneReanimate implements State, ValueAnimator.AnimatorUpdateListener {
 
     private ValueAnimator pointAnimator;
     private CustomBackground customBackground;
     private boolean isAnimationRunning = true;
 
-    public StateReAnimate(CustomBackground _customBackground){
+    public StateOneReanimate(CustomBackground _customBackground){
         customBackground = _customBackground;
     }
 
@@ -60,7 +60,7 @@ public class StateReAnimate implements State, ValueAnimator.AnimatorUpdateListen
             public void onAnimationEnd(Animator animation) {
                 //Log.d(TAG, "onAnimationEnd: " + isAnimationRunning);
                 isAnimationRunning = false;
-                customBackground.setState(customBackground.three);
+                customBackground.setState(customBackground.one);
                 customBackground.state.doFocus();
             }
         });
@@ -91,7 +91,7 @@ public class StateReAnimate implements State, ValueAnimator.AnimatorUpdateListen
                     customBackground.angleForSecondCircle,
                     customBackground.findAngelForSmallCircle(customBackground.optimalPoint));
         }
-    customBackground.invalidate();
+        customBackground.invalidate();
 
     }
 

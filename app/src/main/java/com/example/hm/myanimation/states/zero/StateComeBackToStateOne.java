@@ -1,4 +1,4 @@
-package com.example.hm.myanimation.states.two;
+package com.example.hm.myanimation.states.zero;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Ferenc on 2016.06.08..
+ * Created by Ferenc on 2016.06.12..
  */
-public class StateGoToStateThree implements State {
+public class StateComeBackToStateOne implements State {
     private List<Animator> animatorsGroup1 = new ArrayList<>();
     private List<Animator> animatorsGroup2 = new ArrayList<>();
     private List<Animator> animatorsGroup3 = new ArrayList<>();
@@ -46,27 +46,25 @@ public class StateGoToStateThree implements State {
     private CustomBackground customBackground;
     private boolean isAnimationRunning = true;
 
-    public StateGoToStateThree(CustomBackground _customBackground){
+    public StateComeBackToStateOne(CustomBackground _customBackground){
         customBackground = _customBackground;
     }
 
 
     @Override
     public void doFocus() {
-        if(customBackground.titles.get(0).getTouchedCircle() == 1){
+        if(customBackground.titles.get(2).getTouchedCircle() == 1){
             setAnimatorForTwoCircle1();
             setAnimatorsGroup1();
         }
-        if(customBackground.titles.get(0).getTouchedCircle() == 2){
+        if(customBackground.titles.get(2).getTouchedCircle() == 2){
             setAnimatorForTwoCircle2();
             setAnimatorsGroup2();
         }
-        if(customBackground.titles.get(0).getTouchedCircle() == 3){
+        if(customBackground.titles.get(2).getTouchedCircle() == 3){
             setAnimatorForTwoCircle3();
             setAnimatorsGroup3();
         }
-
-
     }
 
     @Override
@@ -83,35 +81,32 @@ public class StateGoToStateThree implements State {
     public void onAnimationUpdate(ValueAnimator animation) {
         if (customBackground.titles.isEmpty())
             return;
-
-        if(customBackground.titles.get(0).getTouchedCircle() == 1){
+        if(customBackground.titles.get(2).getTouchedCircle() == 1){
             customBackground.radiusForSmallCircle_1 = (float)radiusAnimator1.getAnimatedValue();
-            customBackground.angleForSecondCircle = (int)animatorForTwoCircle12.getAnimatedValue();
-            customBackground.angleForThirdCircle = (int) animatorForTwoCircle13.getAnimatedValue();
+//            customBackground.angleForSecondCircle = (int)animatorForTwoCircle12.getAnimatedValue();
+//            customBackground.angleForThirdCircle = (int) animatorForTwoCircle13.getAnimatedValue();
 
             initCoordinatesForSmallCircles( customBackground.findAngelForSmallCircle(customBackground.optimalPoint),
-                                            customBackground.angleForSecondCircle,
-                                            customBackground.angleForThirdCircle);
+                    customBackground.angleForSecondCircle,
+                    customBackground.angleForThirdCircle);
         }
-        if( customBackground.titles.get(0).getTouchedCircle() == 2){
-           // Log.d("optimal Point", "" + customBackground.radiusForSmallCircle_2);
-
+        if( customBackground.titles.get(2).getTouchedCircle() == 2){
             customBackground.radiusForSmallCircle_2 = (float)radiusAnimator2.getAnimatedValue();
-            customBackground.angleForFirstCircle = (int)animatorForTwoCircle21.getAnimatedValue();
-            customBackground.angleForThirdCircle = (int) animatorForTwoCircle23.getAnimatedValue();
+//            customBackground.angleForFirstCircle = (int)animatorForTwoCircle21.getAnimatedValue();
+//            customBackground.angleForThirdCircle = (int) animatorForTwoCircle23.getAnimatedValue();
 
             initCoordinatesForSmallCircles( customBackground.angleForFirstCircle,
-                                            customBackground.findAngelForSmallCircle(customBackground.optimalPoint),
-                                            customBackground.angleForThirdCircle);
+                    customBackground.findAngelForSmallCircle(customBackground.optimalPoint),
+                    customBackground.angleForThirdCircle);
         }
-        if( customBackground.titles.get(0).getTouchedCircle() == 3){
+        if( customBackground.titles.get(2).getTouchedCircle() == 3){
             customBackground.radiusForSmallCircle_3 = (float)radiusAnimator3.getAnimatedValue();
-            customBackground.angleForFirstCircle = (int)animatorForTwoCircle31.getAnimatedValue();
-            customBackground.angleForSecondCircle = (int) animatorForTwoCircle32.getAnimatedValue();
+//            customBackground.angleForFirstCircle = (int)animatorForTwoCircle31.getAnimatedValue();
+//            customBackground.angleForSecondCircle = (int) animatorForTwoCircle32.getAnimatedValue();
 
             initCoordinatesForSmallCircles( customBackground.angleForFirstCircle,
-                                            customBackground.angleForSecondCircle,
-                                            customBackground.findAngelForSmallCircle(customBackground.optimalPoint));
+                    customBackground.angleForSecondCircle,
+                    customBackground.findAngelForSmallCircle(customBackground.optimalPoint));
         }
 
         customBackground.invalidate();
@@ -119,7 +114,7 @@ public class StateGoToStateThree implements State {
 
     @Override
     public void initCoordinatesForSmallCircles(int _angleForFirstCircle, int _angleForSecondCircle, int _angleForThirdCircle) {
-       // customBackground.waveListener.setWaveProgress();
+        // customBackground.waveListener.setWaveProgress();
 
         customBackground.X1 = customBackground.findOrigoXForSmallCircle(_angleForFirstCircle);
         customBackground.Y1 = customBackground.findOrigoYForSmallCircle(_angleForFirstCircle);
@@ -165,28 +160,28 @@ public class StateGoToStateThree implements State {
 //        animatorForTwoCircle11.addUpdateListener(this);
 //        animatorsGroup1.add(animatorForTwoCircle11);
 
-        animatorForTwoCircle12 = ValueAnimator.ofInt(customBackground.angleForSecondCircle, customBackground.angleForSecondCircle + 30);
-        animatorForTwoCircle12.setDuration(500);
-        animatorForTwoCircle12.setInterpolator(new LinearInterpolator());
-        animatorForTwoCircle12.addUpdateListener(this);
-        animatorsGroup1.add(animatorForTwoCircle12);
-
-
-        animatorForTwoCircle13 = ValueAnimator.ofInt(customBackground.angleForThirdCircle, customBackground.angleForThirdCircle - 30);
-        animatorForTwoCircle13.setDuration(500);
-        animatorForTwoCircle13.setInterpolator(new LinearInterpolator());
-        animatorForTwoCircle13.addUpdateListener(this);
-        animatorsGroup1.add(animatorForTwoCircle13);
+//        animatorForTwoCircle12 = ValueAnimator.ofInt(customBackground.angleForSecondCircle, customBackground.angleForSecondCircle + 30);
+//        animatorForTwoCircle12.setDuration(500);
+//        animatorForTwoCircle12.setInterpolator(new LinearInterpolator());
+//        animatorForTwoCircle12.addUpdateListener(this);
+//        animatorsGroup1.add(animatorForTwoCircle12);
+//
+//
+//        animatorForTwoCircle13 = ValueAnimator.ofInt(customBackground.angleForThirdCircle, customBackground.angleForThirdCircle - 30);
+//        animatorForTwoCircle13.setDuration(500);
+//        animatorForTwoCircle13.setInterpolator(new LinearInterpolator());
+//        animatorForTwoCircle13.addUpdateListener(this);
+//        animatorsGroup1.add(animatorForTwoCircle13);
 
         ValueAnimator pointAnimator = ObjectAnimator.ofObject(this, "optimalPoint", new MyTypeEvaluator(),
                 customBackground.startForStateGoToBottomState,
-                customBackground.endPointForStateGoToStateThree);
+                customBackground.endPointForStateGoToStateOne);
         pointAnimator.setDuration(500);
         pointAnimator.setInterpolator(new LinearInterpolator());
         pointAnimator.addUpdateListener(this);
         animatorsGroup1.add(pointAnimator);
 
-        radiusAnimator1 = ValueAnimator.ofFloat(10, customBackground.radiusForSmallCircles);
+        radiusAnimator1 = ValueAnimator.ofFloat(0, customBackground.radiusForSmallCircles);
         radiusAnimator1.setDuration(500);
         radiusAnimator1.setInterpolator(new LinearInterpolator());
         radiusAnimator1.addUpdateListener(this);
@@ -201,11 +196,11 @@ public class StateGoToStateThree implements State {
             public void onAnimationEnd(Animator animation) {
                 animatorsGroup1.clear();
                 Log.d("clear", "onAnimationEnd: " + customBackground.titles.size());
-                customBackground.titles.clear();
+                customBackground.titles.remove(2);
                 customBackground.waveListener.setWaveProgress();
 
                 isAnimationRunning = false;
-                customBackground.setState(customBackground.three);
+                customBackground.setState(customBackground.one);
                 customBackground.state.doFocus();
             }
         });
@@ -214,33 +209,33 @@ public class StateGoToStateThree implements State {
 
     public void setAnimatorForTwoCircle2(){
 
-        animatorForTwoCircle21 = ValueAnimator.ofInt(customBackground.angleForFirstCircle, customBackground.angleForFirstCircle - 30);
-        animatorForTwoCircle21.setDuration(500);
-        animatorForTwoCircle21.setInterpolator(new LinearInterpolator());
-        animatorForTwoCircle21.addUpdateListener(this);
-        animatorsGroup2.add(animatorForTwoCircle21);
+//        animatorForTwoCircle21 = ValueAnimator.ofInt(customBackground.angleForFirstCircle, customBackground.angleForFirstCircle - 30);
+//        animatorForTwoCircle21.setDuration(500);
+//        animatorForTwoCircle21.setInterpolator(new LinearInterpolator());
+//        animatorForTwoCircle21.addUpdateListener(this);
+//        animatorsGroup2.add(animatorForTwoCircle21);
 
 //        animatorForTwoCircle22 = ValueAnimator.ofInt(customBackground.angleForSecondCircle, customBackground.angleForSecondCircle + 360);
 //        animatorForTwoCircle22.setDuration(500);
 //        animatorForTwoCircle22.setInterpolator(new LinearInterpolator());
 //        animatorForTwoCircle22.addUpdateListener(this);
 //        animatorsGroup2.add(animatorForTwoCircle22);
-
-        animatorForTwoCircle23 = ValueAnimator.ofInt(customBackground.angleForThirdCircle, customBackground.angleForThirdCircle + 30);
-        animatorForTwoCircle23.setDuration(500);
-        animatorForTwoCircle23.setInterpolator(new LinearInterpolator());
-        animatorForTwoCircle23.addUpdateListener(this);
-        animatorsGroup2.add(animatorForTwoCircle23);
+//
+//        animatorForTwoCircle23 = ValueAnimator.ofInt(customBackground.angleForThirdCircle, customBackground.angleForThirdCircle + 30);
+//        animatorForTwoCircle23.setDuration(500);
+//        animatorForTwoCircle23.setInterpolator(new LinearInterpolator());
+//        animatorForTwoCircle23.addUpdateListener(this);
+//        animatorsGroup2.add(animatorForTwoCircle23);
 
         ValueAnimator pointAnimator = ObjectAnimator.ofObject(this, "optimalPoint", new MyTypeEvaluator(),
                 customBackground.startForStateGoToBottomState,
-                customBackground.endPointForStateGoToStateThree);
+                customBackground.endPointForStateGoToStateOne);
         pointAnimator.setDuration(500);
         pointAnimator.setInterpolator(new LinearInterpolator());
         pointAnimator.addUpdateListener(this);
         animatorsGroup2.add(pointAnimator);
 
-        radiusAnimator2 = ValueAnimator.ofFloat(10, customBackground.radiusForSmallCircles);
+        radiusAnimator2 = ValueAnimator.ofFloat(0, customBackground.radiusForSmallCircles);
         radiusAnimator2.setDuration(500);
         radiusAnimator2.setInterpolator(new LinearInterpolator());
         radiusAnimator2.addUpdateListener(this);
@@ -255,11 +250,11 @@ public class StateGoToStateThree implements State {
             public void onAnimationEnd(Animator animation) {
                 animatorsGroup2.clear();
                 Log.d("clear", "onAnimationEnd: " + customBackground.titles.size());
-                customBackground.titles.clear();
+                customBackground.titles.remove(2);
                 customBackground.waveListener.setWaveProgress();
 
                 isAnimationRunning = false;
-                customBackground.setState(customBackground.three);
+                customBackground.setState(customBackground.one);
                 customBackground.state.doFocus();
             }
         });
@@ -268,17 +263,17 @@ public class StateGoToStateThree implements State {
 
     public void setAnimatorForTwoCircle3(){
 
-        animatorForTwoCircle31 = ValueAnimator.ofInt(customBackground.angleForFirstCircle, customBackground.angleForFirstCircle + 30);
-        animatorForTwoCircle31.setDuration(500);
-        animatorForTwoCircle31.setInterpolator(new LinearInterpolator());
-        animatorForTwoCircle31.addUpdateListener(this);
-        animatorsGroup3.add(animatorForTwoCircle31);
-
-        animatorForTwoCircle32 = ValueAnimator.ofInt(customBackground.angleForSecondCircle, customBackground.angleForSecondCircle - 30);
-        animatorForTwoCircle32.setDuration(500);
-        animatorForTwoCircle32.setInterpolator(new LinearInterpolator());
-        animatorForTwoCircle32.addUpdateListener(this);
-        animatorsGroup3.add(animatorForTwoCircle32);
+//        animatorForTwoCircle31 = ValueAnimator.ofInt(customBackground.angleForFirstCircle, customBackground.angleForFirstCircle + 30);
+//        animatorForTwoCircle31.setDuration(500);
+//        animatorForTwoCircle31.setInterpolator(new LinearInterpolator());
+//        animatorForTwoCircle31.addUpdateListener(this);
+//        animatorsGroup3.add(animatorForTwoCircle31);
+//
+//        animatorForTwoCircle32 = ValueAnimator.ofInt(customBackground.angleForSecondCircle, customBackground.angleForSecondCircle - 30);
+//        animatorForTwoCircle32.setDuration(500);
+//        animatorForTwoCircle32.setInterpolator(new LinearInterpolator());
+//        animatorForTwoCircle32.addUpdateListener(this);
+//        animatorsGroup3.add(animatorForTwoCircle32);
 
 //        animatorForTwoCircle33 = ValueAnimator.ofInt(customBackground.angleForSecondCircle, customBackground.angleForSecondCircle + 360);
 //        animatorForTwoCircle33.setDuration(500);
@@ -288,7 +283,7 @@ public class StateGoToStateThree implements State {
 
         ValueAnimator pointAnimator = ObjectAnimator.ofObject(this, "optimalPoint", new MyTypeEvaluator(),
                 customBackground.startForStateGoToBottomState,
-                customBackground.endPointForStateGoToStateThree);
+                customBackground.endPointForStateGoToStateOne);
         pointAnimator.setDuration(500);
         pointAnimator.setInterpolator(new LinearInterpolator());
         pointAnimator.addUpdateListener(this);
@@ -310,11 +305,11 @@ public class StateGoToStateThree implements State {
                 animatorsGroup3.clear();
                 //animation.removeAllListeners();
                 Log.d("clear", "onAnimationEnd: " + customBackground.titles.size());
-                customBackground.titles.clear();
+                customBackground.titles.remove(2);
                 customBackground.waveListener.setWaveProgress();
 
                 isAnimationRunning = false;
-                customBackground.setState(customBackground.three);
+                customBackground.setState(customBackground.one);
                 customBackground.state.doFocus();
             }
         });
